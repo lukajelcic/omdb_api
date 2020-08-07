@@ -9,34 +9,32 @@ import { Modal } from 'antd';
 import { Button } from '@material-ui/core';
 
 const Home = () => {
+    //State section
     const [movies, setMovies] = useState([]);
-    const [movie, setMovie] = useState('lord of the rings');
-    const [error, setError] = useState(null);
-    const [activateModal, setActivateModal] = useState(false);
-    const [detail, setShowDetail] = useState(false);
+    const [search, setSearch] = useState('lord of the rings');
     const [sortDown, setSortDown] = useState(false);
-
+    const [detail, setDetail] = useState(false);
+    const [modal, setModal] = useState(false);
+    const [error, setError] = useState(null);
 
     //URL
-    let url = `http://www.omdbapi.com/?apikey=e33fe7f5&r=json&s=${movie}`;
-
-
+    let url = `http://www.omdbapi.com/?apikey=e33fe7f5&r=json&s=${search}`;
     useEffect(() => {
         fetch(url)
             .then(data => data.json())
-            .then(response => {
-                console.log(response)
-                if (response.Response === "False") {
-                    setError(response.Error)
+            .then(result => {
+                console.log(result)
+                if (result.Response === "False") {
+                    setError(result.Error)
                 } else {
-                    setMovies(response.Search)
+                    setMovies(result.Search)
                 }
             })
             .catch(({ message }) => {
                 setError(message);
             })
 
-    }, [movie])
+    }, [search])
 
     //Sort Movies by Year
     const sortMovies = () => {
@@ -57,22 +55,21 @@ const Home = () => {
     return (
         <div>
             <div style={{ padding: '20px' }} >
-                <Button onClick={sortMovies} variant="outlined">sort by year</Button>
-                <SearchBox searchHandler={setMovie} />
-
+                <SearchBox searchMovie={setSearch} />
             </div>
+            <Button style={{ textAlign: 'center', marginLeft: '60px', color: 'black' }} onClick={sortMovies} variant="contained">sort by year</Button>
             <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: "center", alignItems: "center" }}>
                 {
                     movies !== null && movies.length > 0 && movies.map((result) => (
                         <MovieCard
                             key={result.imdbID}
                             imdbID={result.imdbID}
-                            title={result.Title}
-                            year={result.Year}
-                            poster={result.Poster}
-                            type={result.Type}
-                            showDetail={setShowDetail}
-                            activeModal={setActivateModal}
+                            Title={result.Title}
+                            Year={result.Year}
+                            Poster={result.Poster}
+                            Type={result.Type}
+                            showDetail={setDetail}
+                            modal={setModal}
                         />
                     ))
                 }
@@ -81,8 +78,8 @@ const Home = () => {
             <Modal
                 title='Detail'
                 centered
-                visible={activateModal}
-                onCancel={() => setActivateModal(false)}
+                visible={modal}
+                onCancel={() => setModal(false)}
                 footer={null}
                 width={800}
             >
